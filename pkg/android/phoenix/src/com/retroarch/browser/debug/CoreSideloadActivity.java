@@ -2,11 +2,10 @@ package com.retroarch.browser.debug;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.SystemClock;
+
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.TextView;
@@ -104,32 +103,41 @@ public class CoreSideloadActivity extends Activity
 
             // Copy it
             Log.d("sideload", "Copying " + coreFile.getAbsolutePath() + " to " + destination.getAbsolutePath());
+
             long copied = 0;
             long max = coreFile.length();
-            try
-            {
-                InputStream is = new FileInputStream(coreFile);
-                OutputStream os = new FileOutputStream(destination);
+            int lastPct = -1;
 
-                byte[] buf = new byte[1024];
+            try (InputStream is = new FileInputStream(coreFile);
+                 OutputStream os = new FileOutputStream(destination)) {
+
+                byte[] buf = new byte[256 * 1024];
                 int length;
 
-                while ((length = is.read(buf)) > 0)
-                {
-                    os.write(buf, 0, length);
+                while ((length = is.read(buf)) != -1) {
+                    if (isCancelled()) {
+                        if (destination != null) destination.delete();
+                        return "Cancelled";
+                    }
 
+                    os.write(buf, 0, length);
                     copied += length;
-                    publishProgress((int)(copied / max * 100));
+
+                    if (max > 0) {
+                        int pct = (int)(copied * 100 / max);
+                        if (pct != lastPct) {
+                            lastPct = pct;
+                            publishProgress(pct);
+                        }
+                    }
                 }
 
-                is.close();
-                os.close();
-            }
-            catch (IOException ex)
-            {
+            } catch (IOException ex) {
                 ex.printStackTrace();
+                if (destination != null) destination.delete();
                 return ex.getMessage();
             }
+
 
             return null;
         }
@@ -154,20 +162,28 @@ public class CoreSideloadActivity extends Activity
                 // Run RA with our newly sideloaded core (and content)
                 Intent retro = new Intent(ctx, RetroActivityFuture.class);
 
-                final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-
                 retro.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                 Log.d("sideload", "Running RetroArch with core " + destination.getAbsolutePath());
 
-                MainMenuActivity.startRetroActivity(
-                    retro,
-                    content,
-                    destination.getAbsolutePath(),
-                    UserPreferences.getDefaultConfigPath(ctx),
-                    Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD),
-                    ctx.getApplicationInfo().dataDir,
-                    ctx.getApplicationInfo().sourceDir);
+                long t0 = SystemClock.uptimeMillis();
+                try {
+                    MainMenuActivity.startRetroActivity(
+                        retro,
+                        content,
+                        destination.getAbsolutePath(),
+                        UserPreferences.getDefaultConfigPath(ctx),
+                        Settings.Secure.getString(ctx.getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD),
+                        ctx.getApplicationInfo().dataDir,
+                        ctx.getApplicationInfo().sourceDir);
+                } catch (Throwable t) {
+                   Log.e("sideload", "startRetroActivity failed", t);
+                   progressTextView.setText("Error: " + t.getMessage());
+                   return;
+                }
+
+                long t1 = SystemClock.uptimeMillis();
+                Log.d("sideload", "startRetroActivity took " + (t1 - t0) + "ms");
 
                 ctx.startActivity(retro);
                 ctx.finish();
