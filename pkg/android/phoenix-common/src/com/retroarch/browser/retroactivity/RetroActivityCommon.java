@@ -39,6 +39,10 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.Locale;
 
+import java.util.Set;
+import java.util.HashSet;
+
+
 /**
  * Class which provides common methods for RetroActivity related classes.
  */
@@ -63,13 +67,36 @@ public class RetroActivityCommon extends NativeActivity
   public boolean sustainedPerformanceMode = true;
   public int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
 
+  private static final String TAG = "RetroActivity";
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    cleanupSymlinks();
-    updateSymlinks();
-
     PlayCoreManager.getInstance().onCreate(this);
     super.onCreate(savedInstanceState);
+
+    final Set<String> availableCores =
+      new HashSet<>(Arrays.asList(getAvailableCores()));
+    
+    final SharedPreferences prefs = UserPreferences.getPreferences(this);
+    final File filesDir = getFilesDir();
+    final File nativeLibDir = new File(getApplicationInfo().nativeLibraryDir);
+
+    Log.i(TAG, "onCreate: starting RA-SymlinkWorker");
+
+    new Thread(() -> {
+      long startMs = android.os.SystemClock.uptimeMillis();
+      Log.i(TAG, "RA-SymlinkWorker: begin");
+      try {
+        cleanupSymlinks();
+        updateSymlinks(availableCores, prefs, filesDir, nativeLibDir);
+      } catch (Throwable t) {
+        Log.w(TAG, "RA-SymlinkWorker: failed", t);
+      } finally {
+        long cost = android.os.SystemClock.uptimeMillis() - startMs;
+        Log.i(TAG, "RA-SymlinkWorker: done, cost=" + cost + "ms");
+      }
+    }, "RA-SymlinkWorker").start();
+
   }
 
   @Override
@@ -443,12 +470,36 @@ public class RetroActivityCommon extends NativeActivity
    * @return the list of available cores
    */
   public String[] getAvailableCores() {
-    int id = getResources().getIdentifier("module_names_" + Build.CPU_ABI.replace('-', '_'), "array", getPackageName());
+    // SUPPORTED_ABIS
+    String abi;
+    if (Build.SUPPORTED_ABIS != null && Build.SUPPORTED_ABIS.length > 0) {
+      abi = Build.SUPPORTED_ABIS[0];
+    } else {
+      abi = Build.CPU_ABI; // fallback
+    }
 
-    String[] returnVal = getResources().getStringArray(id);
-    Log.i("RetroActivity", "getAvailableCores: " + Arrays.toString(returnVal));
-    return returnVal;
+    String abiKey = abi.replace('-', '_');
+    String resName = "module_names_" + abiKey;
+
+    int id = getResources().getIdentifier(
+        resName,
+        "array",
+        getPackageName()
+    );
+
+    if (id == 0) {
+      Log.w(
+          TAG,
+          "getAvailableCores: resource not found, abi=" + abi + ", resName=" + resName
+      );
+      return new String[0];
+    }
+
+    String[] cores = getResources().getStringArray(id);
+    Log.i(TAG, "getAvailableCores(" + abi + "): " + Arrays.toString(cores));
+    return cores;
   }
+
 
   /**
    * Gets the list of cores that are currently installed as Dynamic Feature Modules.
@@ -590,6 +641,9 @@ public class RetroActivityCommon extends NativeActivity
     if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return;
 
     File[] files = new File(getCorePath()).listFiles();
+
+    if (files == null) return;
+
     for(int i = 0; i < files.length; i++) {
       try {
         Os.readlink(files[i].getAbsolutePath());
@@ -604,62 +658,45 @@ public class RetroActivityCommon extends NativeActivity
    * Triggers a symlink update in the known places that Dynamic Feature Modules
    * are installed to.
    */
-  public void updateSymlinks() {
-    if(!isPlayStoreBuild()) return;
-
-    traverseFilesystem(getFilesDir());
-    traverseFilesystem(new File(getApplicationInfo().nativeLibraryDir));
+  private void updateSymlinks(Set<String> availableCores, SharedPreferences prefs, File filesDir, File nativeLibDir) {
+    Log.i(TAG, "updateSymlinks: start");
+    if (!isPlayStoreBuild()) return;
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return;
+    traverseFilesystemInternal(filesDir, availableCores, prefs);
+    traverseFilesystemInternal(nativeLibDir, availableCores, prefs);
+    Log.i(TAG, "updateSymlinks: end");
   }
 
-  /**
-   * Traverse the filesystem, looking for native libraries.
-   * Symlinks any libraries it finds to the main RetroArch "cores" folder,
-   * updating any existing symlinks with the correct path to the native libraries.
-   *
-   * This is necessary because Dynamic Feature Modules are first downloaded
-   * and installed to a temporary location on disk, before being moved
-   * to a more permanent location by the system at a later point.
-   *
-   * This could probably be done in native code instead, if that's preferred.
-   *
-   * @param file The parent directory of the tree to traverse.
-   * @param cores List of cores to update.
-   * @param filenames List of filenames to update.
-   */
-  private void traverseFilesystem(File file) {
-    if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return;
+  private void traverseFilesystemInternal(
+      File file,
+      Set<String> availableCores,
+      SharedPreferences prefs
+  ) {
+
+    Log.i(TAG, "traverseFilesystemInternal: dir=" + file.getAbsolutePath());
 
     File[] list = file.listFiles();
-    if(list == null) return;
+    if (list == null) return;
 
-    List<String> availableCores = Arrays.asList(getAvailableCores());
-
-    // Check each file in a directory to see if it's a native library.
-    for(int i = 0; i < list.length; i++) {
+    for (int i = 0; i < list.length; i++) {
       File child = list[i];
       String name = child.getName();
 
-      if(name.startsWith("lib") && name.endsWith(".so") && !name.contains("retroarch-activity")) {
-        // Found a native library!
+      if (name.startsWith("lib") && name.endsWith(".so") && !name.contains("retroarch-activity")) {
         String core = name.subSequence(3, name.length() - 3).toString();
-        String filename = child.getAbsolutePath();
 
-        SharedPreferences prefs = UserPreferences.getPreferences(this);
-        if(!prefs.getBoolean("core_deleted_" + core, false)
-                && availableCores.contains(core)) {
-          // Generate the destination filename and delete any existing symlinks / cores
+        if (!prefs.getBoolean("core_deleted_" + core, false) && availableCores.contains(core)) {
           String newFilename = getCorePath() + core + "_libretro_android.so";
           new File(newFilename).delete();
 
           try {
-            Os.symlink(filename, newFilename);
+            Os.symlink(child.getAbsolutePath(), newFilename);
           } catch (Exception e) {
-            // Symlink failed to be created. Should never happen.
+            Log.w(TAG, "Symlink failed for core=" + core + " -> " + newFilename, e);
           }
         }
-      } else if(file.isDirectory()) {
-        // Found another directory, so traverse it
-        traverseFilesystem(child);
+      } else if (child.isDirectory()) {
+        traverseFilesystemInternal(child, availableCores, prefs);
       }
     }
   }

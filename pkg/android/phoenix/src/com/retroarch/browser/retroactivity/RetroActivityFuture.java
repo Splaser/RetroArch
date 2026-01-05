@@ -64,6 +64,10 @@ public final class RetroActivityFuture extends RetroActivityCamera {
 
     // If QUITFOCUS parameter is provided then enable that Retroarch quits when focus is lost
     quitfocus = getIntent().hasExtra("QUITFOCUS");
+
+    new Handler(Looper.getMainLooper()).post(() -> {
+      Log.i("RetroActivityFuture", "UI loop settled, native can proceed");
+    });
   }
 
   @Override
