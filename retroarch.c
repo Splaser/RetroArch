@@ -45,6 +45,9 @@
 
 #if defined(WEBOS)
 #include <sys/resource.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "input/common/wayland_common_webos.h"
 #endif
 
@@ -72,6 +75,9 @@
 #include <libretro.h>
 #define VFS_FRONTEND
 #include <vfs/vfs_implementation.h>
+#ifdef HAVE_SMBCLIENT
+#include "libretro-common/vfs/vfs_implementation_smb.h"
+#endif
 
 #include <features/features_cpu.h>
 
@@ -3990,6 +3996,8 @@ bool command_event(enum event_command cmd, void *data)
             if (!ol)
                return false;
 
+            input_overlay_next_move_touch_masks(ol);
+
             ol->index                      = ol->next_index;
             ol->active                     = &ol->overlays[ol->index];
 
@@ -4000,7 +4008,6 @@ bool command_event(enum event_command cmd, void *data)
             input_overlay_load_active(input_st->overlay_visibility,
                   ol, input_overlay_opacity);
 
-            ol->flags                     |= INPUT_OVERLAY_BLOCKED;
             ol->next_index                 =
                   (unsigned)((ol->index + 1) % ol->size);
 
@@ -5951,6 +5958,30 @@ void main_exit(void *args)
 #endif
 }
 
+#if defined(WEBOS)
+/* make a directory recursively */
+static int mkdir_p(const char *path, mode_t mode)
+{
+    char tmp[PATH_MAX_LENGTH];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp), "%s", path);
+    len = strlen(tmp);
+    if (tmp[len - 1] == '/')
+        tmp[len - 1] = 0;
+
+    for (p = tmp + 1; *p; p++) {
+        if (*p == '/') {
+            *p = 0;
+            mkdir(tmp, mode);
+            *p = '/';
+        }
+    }
+    return mkdir(tmp, mode);
+}
+#endif
+
 /**
  * main_entry:
  *
@@ -5988,6 +6019,27 @@ int rarch_main(int argc, char *argv[], void *data)
 #endif
 
 #if defined(WEBOS)
+   /* compatibility with webOS 1 and 2 */
+   const char *home = getenv("HOME");
+   const char *appId = getenv("APPID");
+   char new_path[PATH_MAX_LENGTH];
+
+   if (home)
+   {
+      if (!appId || !*appId || strcmp(appId, "com.palm.devmode.openssh") == 0)
+         appId = WEBOS_APP_ID;
+
+      snprintf(new_path, sizeof(new_path), "/%s/.config", home);
+      if (access(new_path, F_OK) != 0 && mkdir(new_path, 0775) != 0)
+      {
+         snprintf(new_path, sizeof(new_path), "/media/developer/temp/webosbrew/%s", appId);
+         if (mkdir_p(new_path, 0775) != 0 && errno != EEXIST)
+            RARCH_WARN("[webOS]: Unable to write to '%s': %s\n", new_path, strerror(errno));
+         else
+            setenv("HOME", new_path, 1);
+      }
+   }
+
    /* compatibility with webOS 3 - 5 */
    if (getenv("EGL_PLATFORM") == NULL)
       setenv("EGL_PLATFORM", "wayland", 0);
@@ -8745,6 +8797,10 @@ bool retroarch_main_quit(void)
 
 #if defined(WEBOS) && defined(HAVE_WAYLAND)
    shutdown_webos_contexts();
+#endif
+
+#ifdef HAVE_SMBCLIENT
+   smb_shutdown();
 #endif
 
    return true;

@@ -926,6 +926,7 @@ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_input_overlay_mouse_hold_msec,      
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_input_overlay_mouse_dtap_to_drag,         MENU_ENUM_SUBLABEL_INPUT_OVERLAY_MOUSE_DTAP_TO_DRAG)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_input_overlay_mouse_dtap_msec,            MENU_ENUM_SUBLABEL_INPUT_OVERLAY_MOUSE_DTAP_MSEC)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_input_overlay_mouse_swipe_threshold,      MENU_ENUM_SUBLABEL_INPUT_OVERLAY_MOUSE_SWIPE_THRESHOLD)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_input_overlay_mouse_alt_two_touch_input,  MENU_ENUM_SUBLABEL_INPUT_OVERLAY_MOUSE_ALT_TWO_TOUCH_INPUT)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_netplay_public_announce,       MENU_ENUM_SUBLABEL_NETPLAY_PUBLIC_ANNOUNCE)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_netplay_ip_address,            MENU_ENUM_SUBLABEL_NETPLAY_IP_ADDRESS)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_netplay_tcp_udp_port,          MENU_ENUM_SUBLABEL_NETPLAY_TCP_UDP_PORT)
@@ -1441,6 +1442,21 @@ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_core_game_ai_options,            MEN
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_game_ai_override_p1,            MENU_ENUM_SUBLABEL_GAME_AI_OVERRIDE_P1)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_game_ai_override_p2,            MENU_ENUM_SUBLABEL_GAME_AI_OVERRIDE_P2)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_game_ai_show_debug,            MENU_ENUM_SUBLABEL_GAME_AI_SHOW_DEBUG)
+#endif
+
+#ifdef HAVE_SMBCLIENT
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_settings,                         MENU_ENUM_SUBLABEL_SMB_CLIENT_SETTINGS)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_enable,                           MENU_ENUM_SUBLABEL_SMB_CLIENT_ENABLE)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_auth_mode,                        MENU_ENUM_SUBLABEL_SMB_CLIENT_AUTH_MODE)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_server,                           MENU_ENUM_SUBLABEL_SMB_CLIENT_SERVER)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_share,                            MENU_ENUM_SUBLABEL_SMB_CLIENT_SHARE)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_subdir,                           MENU_ENUM_SUBLABEL_SMB_CLIENT_SUBDIR)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_username,                         MENU_ENUM_SUBLABEL_SMB_CLIENT_USERNAME)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_password,                         MENU_ENUM_SUBLABEL_SMB_CLIENT_PASSWORD)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_workgroup,                        MENU_ENUM_SUBLABEL_SMB_CLIENT_WORKGROUP)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_num_contexts,                     MENU_ENUM_SUBLABEL_SMB_CLIENT_NUM_CONTEXTS)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_timeout,                          MENU_ENUM_SUBLABEL_SMB_CLIENT_TIMEOUT)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_smb_client_browse,                           MENU_ENUM_SUBLABEL_SMB_CLIENT_BROWSE)
 #endif
 
 static int action_bind_sublabel_systeminfo_controller_entry(
@@ -3994,6 +4010,9 @@ int menu_cbs_init_bind_sublabel(menu_file_list_cbs_t *cbs,
          case MENU_ENUM_LABEL_INPUT_OVERLAY_MOUSE_SWIPE_THRESHOLD:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_input_overlay_mouse_swipe_threshold);
             break;
+         case MENU_ENUM_LABEL_INPUT_OVERLAY_MOUSE_ALT_TWO_TOUCH_INPUT:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_input_overlay_mouse_alt_two_touch_input);
+            break;
          case MENU_ENUM_LABEL_AUDIO_DSP_PLUGIN:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_audio_dsp_plugin);
             break;
@@ -5890,6 +5909,44 @@ int menu_cbs_init_bind_sublabel(menu_file_list_cbs_t *cbs,
             break;
          case MENU_ENUM_LABEL_GAME_AI_SHOW_DEBUG:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_game_ai_show_debug);
+            break;
+#endif
+#ifdef HAVE_SMBCLIENT
+         case MENU_ENUM_LABEL_SMB_CLIENT_SETTINGS:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_settings);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_ENABLE:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_enable);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_AUTH_MODE:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_auth_mode);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_SERVER:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_server);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_SHARE:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_share);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_SUBDIR:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_subdir);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_USERNAME:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_username);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_PASSWORD:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_password);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_WORKGROUP:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_workgroup);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_NUM_CONTEXTS:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_num_contexts);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_TIMEOUT:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_timeout);
+            break;
+         case MENU_ENUM_LABEL_SMB_CLIENT_BROWSE:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_smb_client_browse);
             break;
 #endif
          default:

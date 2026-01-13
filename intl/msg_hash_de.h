@@ -5686,6 +5686,14 @@ MSG_HASH(
    "Wischgesten-Schwellenwert"
    )
 MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_INPUT_OVERLAY_MOUSE_ALT_TWO_TOUCH_INPUT,
+   "Alt. 2-fach-Toucheingabe"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_INPUT_OVERLAY_MOUSE_ALT_TWO_TOUCH_INPUT,
+   "Die zweite Berührung als Maustaste verwenden, während der Cursor gesteuert wird."
+   )
+MSG_HASH(
    MENU_ENUM_SUBLABEL_INPUT_OVERLAY_MOUSE_SWIPE_THRESHOLD,
    "Passt den zulässigen Driftbereich an, wann ein langes Drücken oder Tippen erkannt wird. Wird als Prozentsatz der kleineren Bildschirmabmessung ausgedrückt."
    )
@@ -12604,6 +12612,10 @@ MSG_HASH(
    "Verbunden"
    )
 MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_PORT_DEVICE_NAME,
+   "Gerätename Port %d: %s"
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_PORT_DEVICE_INFO,
    "Geräte-Anzeigename: %s\nGeräte-Konfigurationsname: %s\nGeräte-VID/PID: %d/%d"
    )
@@ -15866,5 +15878,23 @@ MSG_HASH(
 MSG_HASH(
    MENU_ENUM_SUBLABEL_QUICK_MENU_SHOW_GAME_AI,
    "Die Option „Spiel-KI“ anzeigen."
+   )
+#endif
+#ifdef HAVE_SMBCLIENT
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SMB_CLIENT_NUM_CONTEXTS,
+   "Maximale SMB-Verbindungen"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SMB_CLIENT_NUM_CONTEXTS,
+   "Die maximale Anzahl der im Umfeld verwendeten Verbindungen auswählen."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SMB_CLIENT_TIMEOUT,
+   "SMB-Zeitüberschreitung"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SMB_CLIENT_TIMEOUT,
+   "Die Standardzeitüberschreitung in Sekunden auswählen."
    )
 #endif
