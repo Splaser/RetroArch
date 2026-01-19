@@ -2716,7 +2716,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_HDR_MAX_NITS,
-   "Đặt độ sáng tối đa (tính bằng cd/m2) mà màn hình của bạn có thể tái tạo. Xem RTings để biết độ sáng tối đa của màn hình."
+   "Đặt độ sáng đỉnh (tính bằng cd/m²) mà màn hình của bạn có thể hiển thị. Khi đã đặt thì đừng thay đổi nữa. Hãy dùng Paper White Luminance để chỉnh độ sáng tổng thể. Xem RTings.com để biết độ sáng đỉnh của màn hình bạn. Với một số màn hình khi bật scanlines (bên dưới), bạn có thể cần tăng cao hơn mức này (và cả paper white) để làm hình ảnh tổng thể sáng hơn."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_VIDEO_HDR_PAPER_WHITE_NITS,
@@ -2724,24 +2724,37 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_HDR_PAPER_WHITE_NITS,
-   "Thiết lập độ sáng trắng chuẩn cần đạt được, tức là văn bản có thể đọc được hoặc độ sáng ở mức cao nhất của dải SDR (Dải động tiêu chuẩn). Hữu ích để điều chỉnh theo các điều kiện ánh sáng khác nhau trong môi trường của bạn."
-   )
-MSG_HASH(
-   MENU_ENUM_LABEL_VALUE_VIDEO_HDR_CONTRAST,
-   "Tương phản"
-   )
-MSG_HASH(
-   MENU_ENUM_SUBLABEL_VIDEO_HDR_CONTRAST,
-   "Kiểm soát gamma/độ tương phản cho HDR. Lấy màu sắc và tăng phạm vi tổng thể giữa các vùng sáng nhất và tối nhất của hình ảnh. Độ tương phản HDR càng cao, sự chênh lệch này càng lớn, trong khi độ tương phản càng thấp, hình ảnh càng bị nhạt màu. Giúp người dùng tinh chỉnh hình ảnh theo ý thích và cảm thấy hình ảnh hiển thị đẹp nhất trên màn hình."
+   "Khi đã đặt độ sáng đỉnh, hãy dùng nó làm mức sáng tiêu chuẩn. Về mặt kỹ thuật, mục này đặt độ sáng tại mức “paper white”, tức là độ sáng của chữ dễ đọc hoặc mức sáng cao nhất trong dải SDR (Standard Dynamic Range)."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_VIDEO_HDR_EXPAND_GAMUT,
-   "Mở rộng Gam màu"
+   "Tăng cường màu sắc"
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_HDR_EXPAND_GAMUT,
-   "Sau khi không gian màu được chuyển đổi thành không gian tuyến tính, hãy quyết định xem chúng ta có nên sử dụng gam màu mở rộng để đạt được HDR10 hay không."
+   "Dùng toàn bộ dải màu của màn hình để tạo hình ảnh sáng hơn, rực hơn. Muốn màu sắc trung thực với thiết kế gốc của game thì để OFF."
    )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SCANLINES,
+   "Đường quét"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_VIDEO_HDR_SCANLINES,
+   "Bật đường quét HDR. Đường quét là lý do chính để dùng HDR trong RetroArch, vì việc giả lập scanlines chính xác sẽ tắt phần lớn màn hình, và HDR giúp khôi phục lại một phần độ sáng bị mất. Nếu bạn cần nhiều tùy chỉnh scanlines hơn, hãy dùng shader tùy biến của RetroArch."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SUBPIXEL_LAYOUT,
+   "Bố cục điểm ảnh phụ"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_VIDEO_HDR_SUBPIXEL_LAYOUT,
+   "Chọn bố cục subpixel của màn hình, mục này chỉ ảnh hưởng đến đường quét. Nếu không biết bố cục subpixel của màn hình, hãy xem trên Rtings.com mục “subpixel layout” của mẫu màn hình đó"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SUBPIXEL_LAYOUT_RGB,
+   "Tín hiệu RGB (đỏ–lục–lam)"
+   )
+
 
 /* Settings > Video > Synchronization */
 
@@ -4002,7 +4015,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_INPUT_META_DISK_NEXT,
-   "Tăng chỉ mục đĩa hiện đang được chọn. Khay đĩa ảo phải đang mở."
+   "Tăng số thứ tự đĩa đang chọn và thực hiện nạp đĩa trễ nếu khay đĩa ảo đang đóng."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_INPUT_META_DISK_PREV,
@@ -4010,7 +4023,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_INPUT_META_DISK_PREV,
-   "Giảm chỉ mục đĩa hiện đang được chọn. Khay đĩa ảo phải đang mở."
+   "Giảm số thứ tự đĩa đang chọn và thực hiện nạp đĩa trễ nếu khay đĩa ảo đang đóng."
    )
 
 MSG_HASH(
@@ -9945,12 +9958,20 @@ MSG_HASH(
 /* Quick Menu > Disc Control */
 
 MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_DISK_INDEX,
+   "Chỉ số đĩa"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_DISK_INDEX,
+   "Chọn đĩa hiện tại từ danh sách tập tin có sẵn. Khay đĩa ảo có thể vẫn đóng."
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_DISK_TRAY_EJECT,
    "Đẩy đĩa ra"
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_DISK_TRAY_EJECT,
-   "Mở khay đĩa ảo và gỡ đĩa hiện đang nạp. Nếu 'Tạm dừng trò chơi khi Menu đang bật' được bật, một số Core có thể không nhận thay đổi trừ khi trò chơi được tiếp tục trong vài giây sau mỗi thao tác điều khiển đĩa."
+   "Mở khay đĩa ảo."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_DISK_TRAY_INSERT,
@@ -9958,7 +9979,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_DISK_TRAY_INSERT,
-   "Chèn đĩa tương ứng với 'Chỉ số đĩa hiện tại' và đóng khay đĩa ảo. Nếu 'Tạm dừng trò chơi khi Menu đang hoạt động' được bật, một số Core có thể không nhận thay đổi trừ khi trò chơi được tiếp tục trong vài giây sau mỗi thao tác điều khiển đĩa."
+   "Đóng khay đĩa ảo."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_DISK_IMAGE_APPEND,
@@ -9966,20 +9987,9 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_DISK_IMAGE_APPEND,
-   "Đẩy đĩa hiện tại ra, chọn một đĩa mới từ hệ thống tệp rồi chèn vào và đóng khay đĩa ảo.\nLƯU Ý: Đây là tính năng cũ. Thay vào đó, nên tải các trò chơi nhiều đĩa bằng danh sách phát M3U, cho phép chọn đĩa bằng các tùy chọn 'Đẩy/Chèn đĩa' và 'Chỉ số đĩa hiện tại'."
+   "Chọn một đĩa mới từ hệ thống tệp và thêm nó vào cuối danh sách chỉ mục.\nLƯU Ý: Đây là tính năng cũ (legacy). Thay vào đó, nên dùng playlist M3U cho các game nhiều đĩa."
    )
-MSG_HASH(
-   MENU_ENUM_SUBLABEL_DISK_IMAGE_APPEND_TRAY_OPEN,
-   "Chọn một đĩa mới từ hệ thống tệp và chèn vào mà không đóng khay đĩa ảo.\nLƯU Ý: Đây là tính năng cũ. Thay vào đó, nên tải các trò chơi nhiều đĩa bằng danh sách phát M3U, cho phép chọn đĩa bằng tùy chọn 'Chỉ số đĩa hiện tại'."
-   )
-MSG_HASH(
-   MENU_ENUM_LABEL_VALUE_DISK_INDEX,
-   "Chỉ số đĩa"
-   )
-MSG_HASH(
-   MENU_ENUM_SUBLABEL_DISK_INDEX,
-   "Chọn đĩa hiện tại từ danh sách các ảnh đĩa có sẵn. Đĩa sẽ được tải khi chọn 'Chèn đĩa'."
-   )
+/* deprecated */
 
 /* Quick Menu > Shaders */
 

@@ -248,8 +248,9 @@ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_crt_switchres,             MENU_ENUM
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_hdr_enable,      MENU_ENUM_SUBLABEL_VIDEO_HDR_ENABLE)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_hdr_paper_white_nits,      MENU_ENUM_SUBLABEL_VIDEO_HDR_PAPER_WHITE_NITS)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_hdr_max_nits,      MENU_ENUM_SUBLABEL_VIDEO_HDR_MAX_NITS)
-DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_hdr_contrast,      MENU_ENUM_SUBLABEL_VIDEO_HDR_CONTRAST)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_hdr_expand_gamut,      MENU_ENUM_SUBLABEL_VIDEO_HDR_EXPAND_GAMUT)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_hdr_scanlines,      MENU_ENUM_SUBLABEL_VIDEO_HDR_SCANLINES)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_hdr_subpixel_layout,      MENU_ENUM_SUBLABEL_VIDEO_HDR_SUBPIXEL_LAYOUT)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_crt_switchres_super,       MENU_ENUM_SUBLABEL_CRT_SWITCH_RESOLUTION_SUPER)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_crt_switchres_x_axis_centering,       MENU_ENUM_SUBLABEL_CRT_SWITCH_X_AXIS_CENTERING)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_crt_switchres_porch_adjust,       MENU_ENUM_SUBLABEL_CRT_SWITCH_PORCH_ADJUST)
@@ -995,6 +996,12 @@ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_netplay_kick,                       
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_netplay_ban,                           MENU_ENUM_SUBLABEL_NETPLAY_BAN)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_scan_file,                             MENU_ENUM_SUBLABEL_SCAN_FILE)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_scan_directory,                        MENU_ENUM_SUBLABEL_SCAN_DIRECTORY)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_scan_method,                           MENU_ENUM_SUBLABEL_SCAN_METHOD)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_scan_use_db,                           MENU_ENUM_SUBLABEL_SCAN_USE_DB)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_scan_db_select,                        MENU_ENUM_SUBLABEL_SCAN_DB_SELECT)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_scan_target_playlist,                  MENU_ENUM_SUBLABEL_SCAN_TARGET_PLAYLIST)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_scan_single_file,                      MENU_ENUM_SUBLABEL_SCAN_SINGLE_FILE)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_scan_omit_db_ref,                      MENU_ENUM_SUBLABEL_SCAN_OMIT_DB_REF)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_video_swap_interval,                   MENU_ENUM_SUBLABEL_VIDEO_SWAP_INTERVAL)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_sort_savefiles_enable,                 MENU_ENUM_SUBLABEL_SORT_SAVEFILES_ENABLE)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_sort_savestates_enable,                MENU_ENUM_SUBLABEL_SORT_SAVESTATES_ENABLE)
@@ -1107,6 +1114,7 @@ DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_input_latency_frames,               
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_input_latency_frames_range,            MENU_ENUM_SUBLABEL_NETPLAY_INPUT_LATENCY_FRAMES_RANGE)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_disk_tray_eject,                       MENU_ENUM_SUBLABEL_DISK_TRAY_EJECT)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_disk_tray_insert,                      MENU_ENUM_SUBLABEL_DISK_TRAY_INSERT)
+DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_disk_image_append,                     MENU_ENUM_SUBLABEL_DISK_IMAGE_APPEND)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_disk_index,                            MENU_ENUM_SUBLABEL_DISK_INDEX)
 DEFAULT_SUBLABEL_MACRO(action_bind_sublabel_disk_options,                          MENU_ENUM_SUBLABEL_DISK_OPTIONS)
 #ifdef HAVE_XMB
@@ -1629,25 +1637,6 @@ static int action_bind_sublabel_subsystem_load(
       strlcpy(s, buf, len);
 
    return 0;
-}
-
-static int action_bind_sublabel_disk_image_append(
-      file_list_t *list,
-      unsigned type, unsigned i,
-      const char *label, const char *path,
-      char *s, size_t len)
-{
-   enum msg_hash_enums enum_idx  = MENU_ENUM_SUBLABEL_DISK_IMAGE_APPEND;
-   rarch_system_info_t *sys_info = &runloop_state_get_ptr()->system;
-
-   /* Check whether disk is currently ejected */
-   if (sys_info &&
-       disk_control_get_eject_state(&sys_info->disk_control))
-      enum_idx = MENU_ENUM_SUBLABEL_DISK_IMAGE_APPEND_TRAY_OPEN;
-
-   strlcpy(s, msg_hash_to_str(enum_idx), len);
-
-   return 1;
 }
 
 static int action_bind_sublabel_remap_kbd_sublabel(
@@ -3767,6 +3756,24 @@ int menu_cbs_init_bind_sublabel(menu_file_list_cbs_t *cbs,
          case MENU_ENUM_LABEL_SCAN_DIRECTORY:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_scan_directory);
             break;
+         case MENU_ENUM_LABEL_SCAN_METHOD:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_scan_method);
+            break;
+         case MENU_ENUM_LABEL_SCAN_USE_DB:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_scan_use_db);
+            break;
+         case MENU_ENUM_LABEL_SCAN_DB_SELECT:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_scan_db_select);
+            break;
+         case MENU_ENUM_LABEL_SCAN_TARGET_PLAYLIST:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_scan_target_playlist);
+            break;
+         case MENU_ENUM_LABEL_SCAN_SINGLE_FILE:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_scan_single_file);
+            break;
+         case MENU_ENUM_LABEL_SCAN_OMIT_DB_REF:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_scan_omit_db_ref);
+            break;
          case MENU_ENUM_LABEL_NETPLAY_KICK:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_netplay_kick);
             break;
@@ -5230,20 +5237,23 @@ int menu_cbs_init_bind_sublabel(menu_file_list_cbs_t *cbs,
          case MENU_ENUM_LABEL_VIDEO_HDR_SETTINGS:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_video_hdr_settings_list);
             break;
-         case MENU_ENUM_LABEL_VIDEO_HDR_PAPER_WHITE_NITS:
-            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_hdr_paper_white_nits);
-            break;
          case MENU_ENUM_LABEL_VIDEO_HDR_ENABLE:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_hdr_enable);
+            break;
+         case MENU_ENUM_LABEL_VIDEO_HDR_PAPER_WHITE_NITS:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_hdr_paper_white_nits);
             break;
          case MENU_ENUM_LABEL_VIDEO_HDR_MAX_NITS:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_hdr_max_nits);
             break;
-         case MENU_ENUM_LABEL_VIDEO_HDR_CONTRAST:
-            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_hdr_contrast);
-            break;
          case MENU_ENUM_LABEL_VIDEO_HDR_EXPAND_GAMUT:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_hdr_expand_gamut);
+            break;
+         case MENU_ENUM_LABEL_VIDEO_HDR_SCANLINES:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_hdr_scanlines);
+            break;
+         case MENU_ENUM_LABEL_VIDEO_HDR_SUBPIXEL_LAYOUT:
+            BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_hdr_subpixel_layout);
             break;
          case MENU_ENUM_LABEL_VIDEO_OUTPUT_SETTINGS:
             BIND_ACTION_SUBLABEL(cbs, action_bind_sublabel_video_output_settings_list);

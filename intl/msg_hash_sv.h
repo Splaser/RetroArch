@@ -2006,7 +2006,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_SHADER_SUBFRAMES,
-   "VARNING: Snabbt flimmer kan orsaka bildbeständighet på vissa skärmar. Använd på egen risk // Simulerar en grundläggande rullande scanline över flera underrutor genom att dela upp skärmen vertikalt och rendera varje del av skärmen beroende på hur många underrutor det finns."
+   "VARNING: Snabbt flimmer kan orsaka bildbeständighet på vissa skärmar. Använd på egen risk // Simulerar en grundläggande rullande skanningslinje över flera underrutor genom att dela upp skärmen vertikalt och rendera varje del av skärmen beroende på hur många underrutor det finns."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_VIDEO_SHADER_SUBFRAMES,
@@ -2018,15 +2018,15 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_VIDEO_SCAN_SUBFRAMES,
-   "Rullande skanlinjesimulering"
+   "Rullande skanningslinjesimulering"
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_SCAN_SUBFRAMES,
-   "VARNING: Snabbt flimmer kan orsaka bildbeständighet på vissa skärmar. Använd på egen risk // Simulerar en grundläggande rullande scanline över flera underrutor genom att dela upp skärmen vertikalt och rendera varje del av skärmen beroende på hur många underrutor det finns."
+   "VARNING: Snabbt flimmer kan orsaka bildbeständighet på vissa skärmar. Använd på egen risk // Simulerar en grundläggande rullande skanningslinje över flera underrutor genom att dela upp skärmen vertikalt och rendera varje del av skärmen beroende på hur många underrutor det finns."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_VIDEO_SCAN_SUBFRAMES,
-   "Simulerar en grundläggande rullande scanline över flera subframes genom att dela upp skärmen vertikalt och rendera varje del av skärmen enligt hur många subframes det finns från toppen av skärmen och nedåt."
+   "Simulerar en grundläggande rullande skanningslinje över flera subframes genom att dela upp skärmen vertikalt och rendera varje del av skärmen enligt hur många subframes det finns från toppen av skärmen och nedåt."
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_GPU_SCREENSHOT,
@@ -2592,7 +2592,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_HDR_MAX_NITS,
-   "Ställ in den högsta ljusstyrka (i cd/m2) som bildskärmen kan reproducera. Se bruksanvisning för bildskärmens högsta ljusstyrka."
+   "Ställ in den maximala luminansen (i cd/m2) som din skärm kan återge. När du har ställt in den ska du inte ändra den. Använd Paper White Luminance för att ställa in ljusstyrkan. Se RTings.com för din skärms maximala luminans. På vissa skärmar med skanningslinjer aktiverade (nedan) kan du behöva överdriva detta (och pappervit) för att höja den totala ljusstyrkan."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_VIDEO_HDR_PAPER_WHITE_NITS,
@@ -2600,24 +2600,33 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_HDR_PAPER_WHITE_NITS,
-   "Ställ in ljusstyrka vid vilken vitt papper ska vara, nämligen läsbar text eller ljusstyrka överst i SDR (Standard Dynamic Range). Användbar för att anpassa till olika ljusförhållanden i din miljö."
-   )
-MSG_HASH(
-   MENU_ENUM_LABEL_VALUE_VIDEO_HDR_CONTRAST,
-   "Kontrast"
-   )
-MSG_HASH(
-   MENU_ENUM_SUBLABEL_VIDEO_HDR_CONTRAST,
-   "Gamma/kontrastkontroll för HDR. Tar färgerna och ökar det totala intervallet mellan de ljusaste och mörkaste delarna av bilden. Ju högre HDR-kontrasten är, desto större blir denna skillnad, medan ju lägre kontrasten är, desto mer urtvättad blir bilden. Hjälper användarna att ställa in bilden efter deras smak och vad de tycker ser bäst ut på deras display."
+   "När maximal luminans har ställts in använder du denna som standardinställning för ljusstyrka. Tekniskt sett ställer detta in den luminans som papperets vita yta ska ha, dvs. läsbar text eller luminans i toppen av SDR-intervallet (Standard Dynamic Range)."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_VIDEO_HDR_EXPAND_GAMUT,
-   "Expandera Gamma"
+   "Färgförstärkning"
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_HDR_EXPAND_GAMUT,
-   "När färgrymden har konverterats till linjär rymd, bestäm om ett utökat färgomfång ska användas för att komma till HDR10."
+   "Använder skärmens hela färgskala för att skapa en ljusare och mer mättad bild. För färger som är mer trogna det ursprungliga speldesignen, ställ in detta på AV."
    )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SCANLINES,
+   "Skanningslinjer"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_VIDEO_HDR_SCANLINES,
+   "Aktivera HDR-skanningslinjer. Skanningslinjer är den främsta anledningen till att använda HDR i RetroArch, eftersom en korrekt implementering av skanningslinjer stänger av större delen av skärmen och HDR återställer en del av den förlorade ljusstyrkan. Om du behöver mer kontroll över dina skanningslinjer kan du använda de anpassade skuggare som RetroArch tillhandahåller."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SUBPIXEL_LAYOUT,
+   "Subpixel-layout"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_VIDEO_HDR_SUBPIXEL_LAYOUT,
+   "Välj din skärms subpixel-layout, detta påverkar endast skanningslinjer. Om du inte vet vad din skärms subpixel-layout är, se Rtings.com för din skärms ”subpixel-layout”"
+   )
+
 
 /* Settings > Video > Synchronization */
 
@@ -3846,7 +3855,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_INPUT_META_DISK_NEXT,
-   "Ökar det aktuellt valda skivindexet. Virtuellt skivfack måste vara öppet."
+   "Ökar det aktuella valda skivindexet och gör en fördröjd insättning om den virtuella skivfacket är stängt."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_INPUT_META_DISK_PREV,
@@ -3854,7 +3863,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_INPUT_META_DISK_PREV,
-   "Minskar det aktuellt valda skivindexet. Virtuellt skivfack måste vara öppet."
+   "Minskar det aktuella valda skivindexet och gör en fördröjd insättning om den virtuella skivfacket är stängt."
    )
 
 MSG_HASH(
@@ -9653,41 +9662,22 @@ MSG_HASH(
 /* Quick Menu > Disc Control */
 
 MSG_HASH(
-   MENU_ENUM_LABEL_VALUE_DISK_TRAY_EJECT,
-   "Mata ut skiva"
+   MENU_ENUM_LABEL_VALUE_DISK_INDEX,
+   "Aktuellt skivindex"
    )
 MSG_HASH(
-   MENU_ENUM_SUBLABEL_DISK_TRAY_EJECT,
-   "Öppna virtuellt skivfack och ta bort den laddade skivan. Om 'Pausa innehåll när menyn är aktiv' är aktiverat kanske vissa kärnor inte registrera ändringar om inte innehållet återupptas i några sekunder efter varje skivkontrollsåtgärd."
+   MENU_ENUM_LABEL_VALUE_DISK_TRAY_EJECT,
+   "Mata ut skiva"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_DISK_TRAY_INSERT,
    "Sätt i skiva"
    )
 MSG_HASH(
-   MENU_ENUM_SUBLABEL_DISK_TRAY_INSERT,
-   "Mata in skiva som matchar 'Nuvarande skivindex' och stäng virtuellt diskfack. Om 'Pausa innehåll när menyn är aktiv' är aktiverat kanske vissa kärnor inte registrera ändringar om inte innehållet återupptas i några sekunder efter varje skivkontrollsåtgärd."
-   )
-MSG_HASH(
    MENU_ENUM_LABEL_VALUE_DISK_IMAGE_APPEND,
    "Läs in ny skiva"
    )
-MSG_HASH(
-   MENU_ENUM_SUBLABEL_DISK_IMAGE_APPEND,
-   "Mata ut aktuell skiva, välj en ny skiva från filsystemet, och mata sedan in den och stäng det virtuella skivfacket.\nOBS: Detta är en äldre funktion. Det rekommenderas istället att läsa in flerskivstitlar via M3U-spellistor vilket tillåter val av skiva med alternativen 'Mata ut/in skiva' och 'Aktuellt skivindex'."
-   )
-MSG_HASH(
-   MENU_ENUM_SUBLABEL_DISK_IMAGE_APPEND_TRAY_OPEN,
-   "Välj en ny skiva från filsystemet och mata in utan att stänga det virtuella skivfacket.\nOBS: Detta är en äldre funktion. Det rekommenderas istället att läsa in flerskivstitlar via M3U-spellistor vilket tillåter val av skiva med alternativen 'Mata ut/in skiva' och 'Aktuellt skivindex'."
-   )
-MSG_HASH(
-   MENU_ENUM_LABEL_VALUE_DISK_INDEX,
-   "Aktuellt skivindex"
-   )
-MSG_HASH(
-   MENU_ENUM_SUBLABEL_DISK_INDEX,
-   "Välj aktuell skiva från listan över tillgängliga avbilder. Skivan läses in när ”Mata in skiva” väljs."
-   )
+/* deprecated */
 
 /* Quick Menu > Shaders */
 

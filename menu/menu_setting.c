@@ -3111,6 +3111,27 @@ static size_t setting_get_string_representation_video_font_path(
          "", len);
 }
 
+static size_t setting_get_string_representation_video_hdr_subpixel_layout(
+      rarch_setting_t *setting, char *s, size_t len)
+{
+   if (setting)
+   {
+      switch (*setting->value.target.unsigned_integer)
+      {
+         case 0:
+            return strlcpy(s, msg_hash_to_str(
+                     MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SUBPIXEL_LAYOUT_RGB), len);
+         case 1:
+            return strlcpy(s, msg_hash_to_str(
+                     MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SUBPIXEL_LAYOUT_RBG), len);
+         case 2:
+            return strlcpy(s, msg_hash_to_str(
+                     MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SUBPIXEL_LAYOUT_BGR), len);
+      }
+   }
+   return 0;
+}
+
 static size_t setting_get_string_representation_state_slot(
       rarch_setting_t *setting, char *s, size_t len)
 {
@@ -5573,17 +5594,18 @@ static bool setting_is_protected_driver(rarch_setting_t *setting)
 static int setting_action_left_analog_dpad_mode(
       rarch_setting_t *setting, size_t idx, bool wraparound)
 {
-   unsigned        port = 0;
    settings_t *settings = config_get_ptr();
+   unsigned port        = 0;
 
    if (!setting)
       return -1;
 
    port = setting->index_offset;
 
-   configuration_set_uint(settings, settings->uints.input_analog_dpad_mode[port],
-      (settings->uints.input_analog_dpad_mode
-       [port] + ANALOG_DPAD_LAST - 1) % ANALOG_DPAD_LAST);
+   settings->flags |= SETTINGS_FLG_MODIFIED;
+   settings->uints.input_analog_dpad_mode[port] =
+      (settings->uints.input_analog_dpad_mode[port] + ANALOG_DPAD_LAST - 1)
+      % ANALOG_DPAD_LAST;
 
    return 0;
 }
@@ -5717,11 +5739,26 @@ static int setting_uint_action_left_crt_switch_resolution_super(
    return 0;
 }
 
+static bool setting_action_input_device_index_prevent(
+      rarch_setting_t *setting, settings_t *settings, unsigned p, unsigned p_new)
+{
+   /* Prevent accidental port 1 device index removal */
+   if (setting->index_offset == 0)
+   {
+      if (     p == setting->index_offset
+            && !string_is_empty(input_config_get_device_name(setting->index_offset))
+            && string_is_empty(input_config_get_device_name(p_new)))
+         return true;
+   }
+   return false;
+}
+
 static int setting_action_left_input_device_index(
       rarch_setting_t *setting, size_t idx, bool wraparound)
 {
    settings_t      *settings = config_get_ptr();
    unsigned *p               = NULL;
+   unsigned p_new            = 0;
 
    if (!setting || !settings)
       return -1;
@@ -5729,9 +5766,14 @@ static int setting_action_left_input_device_index(
    p = &settings->uints.input_joypad_index[setting->index_offset];
 
    if (*p)
-      (*p)--;
+      p_new = *p - 1;
    else
-      *p = MAX_INPUT_DEVICES - 1;
+      p_new = MAX_INPUT_DEVICES - 1;
+
+   if (setting_action_input_device_index_prevent(setting, settings, *p, p_new))
+      return 0;
+
+   *p = p_new;
 
    settings->flags |= SETTINGS_FLG_MODIFIED;
    return 0;
@@ -6781,14 +6823,46 @@ static size_t setting_get_string_representation_uint_libretro_device(
 static size_t setting_get_string_representation_uint_analog_dpad_mode(
       rarch_setting_t *setting, char *s, size_t len)
 {
-   const char *modes[5];
-   modes[0] = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_NONE);
-   modes[1] = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_LEFT_ANALOG);
-   modes[2] = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_RIGHT_ANALOG);
-   modes[3] = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_LEFT_ANALOG_FORCED);
-   modes[4] = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_RIGHT_ANALOG_FORCED);
-   return strlcpy(s, modes[*setting->value.target.unsigned_integer
-         % ANALOG_DPAD_LAST], len);
+   const char *name = NULL;
+
+   if (!setting)
+      return 0;
+
+   switch (*setting->value.target.unsigned_integer)
+   {
+      default:
+      case ANALOG_DPAD_NONE:
+         name = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_NONE);
+         break;
+      case ANALOG_DPAD_LSTICK:
+         name = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_LEFT_ANALOG);
+         break;
+      case ANALOG_DPAD_LSTICK_FORCED:
+         name = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_LEFT_ANALOG_FORCED);
+         break;
+      case ANALOG_DPAD_RSTICK:
+         name = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_RIGHT_ANALOG);
+         break;
+      case ANALOG_DPAD_RSTICK_FORCED:
+         name = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_RIGHT_ANALOG_FORCED);
+         break;
+      case ANALOG_DPAD_LRSTICK:
+         name = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_LEFTRIGHT_ANALOG);
+         break;
+      case ANALOG_DPAD_LRSTICK_FORCED:
+         name = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_LEFTRIGHT_ANALOG_FORCED);
+         break;
+      case ANALOG_DPAD_TWINSTICK:
+         name = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_TWINSTICK_ANALOG);
+         break;
+      case ANALOG_DPAD_TWINSTICK_FORCED:
+         name = msg_hash_to_str(MENU_ENUM_LABEL_VALUE_TWINSTICK_ANALOG_FORCED);
+         break;
+   }
+
+   if (!string_is_empty(name))
+      return strlcpy(s, name, len);
+   return 0;
 }
 
 static size_t setting_get_string_representation_uint_input_remap_port(
@@ -7767,16 +7841,6 @@ static int setting_action_start_custom_vp_height(rarch_setting_t *setting)
    return 0;
 }
 
-static int setting_action_start_analog_dpad_mode(rarch_setting_t *setting)
-{
-   if (!setting)
-      return -1;
-
-   *setting->value.target.unsigned_integer = 0;
-
-   return 0;
-}
-
 static int setting_action_start_libretro_device_type(rarch_setting_t *setting)
 {
    retro_ctx_controller_info_t pad;
@@ -7857,8 +7921,8 @@ static int setting_action_start_input_mouse_index(rarch_setting_t *setting)
 static int setting_action_right_analog_dpad_mode(
       rarch_setting_t *setting, size_t idx, bool wraparound)
 {
-   unsigned port = 0;
-   settings_t      *settings = config_get_ptr();
+   settings_t *settings = config_get_ptr();
+   unsigned port        = 0;
 
    if (!setting)
       return -1;
@@ -7948,6 +8012,7 @@ static int setting_action_right_input_device_index(
 {
    settings_t      *settings = config_get_ptr();
    unsigned *p               = NULL;
+   unsigned p_new            = 0;
 
    if (!setting || !settings)
       return -1;
@@ -7955,9 +8020,14 @@ static int setting_action_right_input_device_index(
    p = &settings->uints.input_joypad_index[setting->index_offset];
 
    if (*p < MAX_INPUT_DEVICES - 1)
-      (*p)++;
+      p_new = *p + 1;
    else
-      *p = 0;
+      p_new = 0;
+
+   if (setting_action_input_device_index_prevent(setting, settings, *p, p_new))
+      return 0;
+
+   *p = p_new;
 
    settings->flags |= SETTINGS_FLG_MODIFIED;
    return 0;
@@ -8096,9 +8166,9 @@ static size_t get_string_representation_split_joycon(
 static size_t get_string_representation_input_device_index(
       rarch_setting_t *setting, char *s, size_t len)
 {
-   size_t _len = 0;
-   settings_t      *settings = config_get_ptr();
-   unsigned map              = 0;
+   settings_t *settings = config_get_ptr();
+   size_t _len          = 0;
+   unsigned map         = 0;
 
    if (!setting || !settings)
       return 0;
@@ -8111,20 +8181,21 @@ static size_t get_string_representation_input_device_index(
             ? input_config_get_device_display_name(map)
             : input_config_get_device_name(map);
 
+      _len = snprintf(s, len,
+            "#%u: %s",
+            map + 1,
+            !string_is_empty(device_name)
+                  ? device_name
+                  : msg_hash_to_str(MENU_ENUM_LABEL_VALUE_NOT_AVAILABLE));
+
       if (!string_is_empty(device_name))
       {
          unsigned idx = input_config_get_device_name_index(map);
-         size_t _len  = snprintf(s, len, "#%u: %s", map + 1, device_name);
 
          /* If idx is non-zero, it's part of a set */
          if (idx > 0)
             _len += snprintf(s + _len, len - _len, " (%u)", idx);
       }
-      else
-         _len = snprintf(s, len,
-               "#%u: %s",
-               map + 1,
-               msg_hash_to_str(MENU_ENUM_LABEL_VALUE_NOT_AVAILABLE));
    }
 
    if (string_is_empty(s))
@@ -8166,9 +8237,9 @@ static size_t setting_get_string_representation_input_device_reserved_device_nam
 static size_t get_string_representation_input_mouse_index(
       rarch_setting_t *setting, char *s, size_t len)
 {
-   size_t _len = 0;
-   settings_t      *settings = config_get_ptr();
-   unsigned map              = 0;
+   settings_t *settings = config_get_ptr();
+   size_t _len          = 0;
+   unsigned map         = 0;
 
    if (!setting || !settings)
       return 0;
@@ -8178,15 +8249,15 @@ static size_t get_string_representation_input_mouse_index(
    if (map < MAX_INPUT_DEVICES)
    {
       const char *device_name = input_config_get_mouse_display_name(map);
-      if (!string_is_empty(device_name))
-         _len = snprintf(s, len, "#%u: %s", map + 1, device_name);
-      else if (map > 0)
-         _len = snprintf(s, len,
-               "#%u: %s",
-               map + 1,
-               msg_hash_to_str(MENU_ENUM_LABEL_VALUE_NOT_AVAILABLE));
-      else
-         _len = strlcpy(s, msg_hash_to_str(MENU_ENUM_LABEL_VALUE_DONT_CARE), len);
+
+      _len = snprintf(s, len,
+            "#%u: %s",
+            map + 1,
+            !string_is_empty(device_name)
+                  ? device_name
+                  : (map > 0)
+                        ? msg_hash_to_str(MENU_ENUM_LABEL_VALUE_NOT_AVAILABLE)
+                        : msg_hash_to_str(MENU_ENUM_LABEL_VALUE_DONT_CARE));
    }
 
    if (string_is_empty(s))
@@ -8611,7 +8682,6 @@ static void general_write_handler(rarch_setting_t *setting)
          break;
       case MENU_ENUM_LABEL_VIDEO_HDR_PAPER_WHITE_NITS:
          {
-            settings_t *settings                          = config_get_ptr();
             video_driver_state_t *video_st                = video_state_get_ptr();
             settings->flags                              |= SETTINGS_FLG_MODIFIED;
             settings->floats.video_hdr_paper_white_nits   = roundf(*setting->value.target.fraction);
@@ -8619,17 +8689,6 @@ static void general_write_handler(rarch_setting_t *setting)
             if (video_st && video_st->poke && video_st->poke->set_hdr_paper_white_nits)
                video_st->poke->set_hdr_paper_white_nits(video_st->data,
                      settings->floats.video_hdr_paper_white_nits);
-         }
-         break;
-      case MENU_ENUM_LABEL_VIDEO_HDR_CONTRAST:
-         {
-            video_driver_state_t *video_st                = video_state_get_ptr();
-            settings->flags                              |= SETTINGS_FLG_MODIFIED;
-            settings->floats.video_hdr_display_contrast   = *setting->value.target.fraction;
-
-            if (video_st && video_st->poke && video_st->poke->set_hdr_contrast)
-               video_st->poke->set_hdr_contrast(video_st->data,
-                     VIDEO_HDR_MAX_CONTRAST - settings->floats.video_hdr_display_contrast);
          }
          break;
       case MENU_ENUM_LABEL_VIDEO_HDR_EXPAND_GAMUT:
@@ -8641,6 +8700,28 @@ static void general_write_handler(rarch_setting_t *setting)
             if (video_st && video_st->poke && video_st->poke->set_hdr_expand_gamut)
                video_st->poke->set_hdr_expand_gamut(video_st->data,
                      settings->bools.video_hdr_expand_gamut);
+         }
+         break;
+      case MENU_ENUM_LABEL_VIDEO_HDR_SCANLINES:
+         {
+            video_driver_state_t *video_st               = video_state_get_ptr();
+            settings->flags                              |= SETTINGS_FLG_MODIFIED;
+            settings->bools.video_hdr_scanlines          = *setting->value.target.boolean;
+
+            if (video_st && video_st->poke && video_st->poke->set_hdr_scanlines)
+               video_st->poke->set_hdr_scanlines(video_st->data,
+                     settings->bools.video_hdr_scanlines);
+         }
+         break;
+      case MENU_ENUM_LABEL_VIDEO_HDR_SUBPIXEL_LAYOUT:
+         {
+            video_driver_state_t *video_st                  = video_state_get_ptr();
+            settings->flags                                 |= SETTINGS_FLG_MODIFIED;
+            settings->uints.video_hdr_subpixel_layout   = *setting->value.target.unsigned_integer;
+
+            if (video_st && video_st->poke && video_st->poke->set_hdr_subpixel_layout)
+               video_st->poke->set_hdr_subpixel_layout(video_st->data,
+                     settings->uints.video_hdr_subpixel_layout);
          }
          break;
       case MENU_ENUM_LABEL_INPUT_MAX_USERS:
@@ -9576,7 +9657,7 @@ static bool setting_append_list_input_player_options(
             &settings->uints.input_analog_dpad_mode[user],
             analog_to_digital[user],
             label_analog_to_digital[user],
-            user,
+            ANALOG_DPAD_LSTICK,
             &group_info,
             &subgroup_info,
             parent_group,
@@ -9587,7 +9668,6 @@ static bool setting_append_list_input_player_options(
       (*list)[list_info->index - 1].action_left   = &setting_action_left_analog_dpad_mode;
       (*list)[list_info->index - 1].action_right  = &setting_action_right_analog_dpad_mode;
       (*list)[list_info->index - 1].action_select = &setting_action_right_analog_dpad_mode;
-      (*list)[list_info->index - 1].action_start  = &setting_action_start_analog_dpad_mode;
       (*list)[list_info->index - 1].action_ok     = &setting_action_ok_uint;
       (*list)[list_info->index - 1].get_string_representation =
          &setting_get_string_representation_uint_analog_dpad_mode;
@@ -13888,27 +13968,37 @@ static bool setting_append_list(
                   (*list)[list_info->index - 1].action_ok = &setting_action_ok_uint;
                   menu_settings_list_current_add_range(list, list_info, 0.0, 10000.0, 10.0, true, true);
 
-                  CONFIG_FLOAT(
-                        list, list_info,
-                        &settings->floats.video_hdr_display_contrast,
-                        MENU_ENUM_LABEL_VIDEO_HDR_CONTRAST,
-                        MENU_ENUM_LABEL_VALUE_VIDEO_HDR_CONTRAST,
-                        DEFAULT_VIDEO_HDR_CONTRAST,
-                        "%.2fx",
-                        &group_info,
-                        &subgroup_info,
-                        parent_group,
-                        general_write_handler,
-                        general_read_handler);
-                  (*list)[list_info->index - 1].action_ok = &setting_action_ok_uint;
-                  menu_settings_list_current_add_range(list, list_info, 0.0, VIDEO_HDR_MAX_CONTRAST, 0.1, true, true);
-
                   CONFIG_BOOL(
                         list, list_info,
                         &settings->bools.video_hdr_expand_gamut,
                         MENU_ENUM_LABEL_VIDEO_HDR_EXPAND_GAMUT,
                         MENU_ENUM_LABEL_VALUE_VIDEO_HDR_EXPAND_GAMUT,
                         DEFAULT_VIDEO_HDR_EXPAND_GAMUT,
+                        MENU_ENUM_LABEL_VALUE_OFF,
+                        MENU_ENUM_LABEL_VALUE_ON,
+                        &group_info,
+                        &subgroup_info,
+                        parent_group,
+                        general_write_handler,
+                        general_read_handler,
+                        SD_FLAG_NONE);
+
+                  START_SUB_GROUP(list, list_info, "HDR", &group_info, &subgroup_info, parent_group);
+
+                  CONFIG_ACTION(
+                        list, list_info,
+                        MENU_ENUM_LABEL_VIDEO_HDR_SETTINGS,
+                        MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SETTINGS,
+                        &group_info,
+                        &subgroup_info,
+                        parent_group);
+
+                  CONFIG_BOOL(
+                        list, list_info,
+                        &settings->bools.video_hdr_scanlines,
+                        MENU_ENUM_LABEL_VIDEO_HDR_SCANLINES,
+                        MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SCANLINES,
+                        DEFAULT_VIDEO_HDR_SCANLINES,
                         MENU_ENUM_LABEL_VALUE_OFF,
                         MENU_ENUM_LABEL_VALUE_ON,
                         &group_info,
@@ -13924,6 +14014,26 @@ static bool setting_append_list(
                         list,
                         list_info,
                         CMD_EVENT_VIDEO_APPLY_STATE_CHANGES);
+
+                  {
+                     CONFIG_UINT(
+                           list, list_info,
+                           &settings->uints.video_hdr_subpixel_layout,
+                           MENU_ENUM_LABEL_VIDEO_HDR_SUBPIXEL_LAYOUT,
+                           MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SUBPIXEL_LAYOUT,
+                           DEFAULT_VIDEO_HDR_SUBPIXEL_LAYOUT,
+                           &group_info,
+                           &subgroup_info,
+                           parent_group,
+                           general_write_handler,
+                           general_read_handler);
+                     (*list)[list_info->index - 1].action_ok = &setting_action_ok_uint;
+                     (*list)[list_info->index - 1].get_string_representation =
+                           &setting_get_string_representation_video_hdr_subpixel_layout;
+                     menu_settings_list_current_add_range(list, list_info, 0, 2, 1, true, true);
+                  }
+
+                  END_SUB_GROUP(list, list_info, parent_group);
                }
 
                END_SUB_GROUP(list, list_info, parent_group);
