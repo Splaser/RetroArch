@@ -337,9 +337,7 @@ const struct input_bind_map input_config_bind_map[RARCH_BIND_LIST_END_NULL] = {
    DECLARE_BIND(hold,                          RARCH_HOLD_ENABLE,            MENU_ENUM_LABEL_VALUE_INPUT_HOLD),
 
    DECLARE_META_BIND(2, enable_hotkey,         RARCH_ENABLE_HOTKEY,          MENU_ENUM_LABEL_VALUE_INPUT_META_ENABLE_HOTKEY),
-#ifdef HAVE_MENU
    DECLARE_META_BIND(1, menu_toggle,           RARCH_MENU_TOGGLE,            MENU_ENUM_LABEL_VALUE_INPUT_META_MENU_TOGGLE),
-#endif
 #ifdef HAVE_LAKKA
    DECLARE_META_BIND(2, exit_emulator,         RARCH_QUIT_KEY,               MENU_ENUM_LABEL_VALUE_INPUT_META_RESTART_KEY),
 #else
@@ -1818,7 +1816,9 @@ static struct config_bool_setting *populate_settings_bool(
    SETTING_BOOL("savefiles_in_content_dir",      &settings->bools.savefiles_in_content_dir, true, DEFAULT_SAVEFILES_IN_CONTENT_DIR, false);
    SETTING_BOOL("systemfiles_in_content_dir",    &settings->bools.systemfiles_in_content_dir, true, DEFAULT_SYSTEMFILES_IN_CONTENT_DIR, false);
    SETTING_BOOL("screenshots_in_content_dir",    &settings->bools.screenshots_in_content_dir, true, DEFAULT_SCREENSHOTS_IN_CONTENT_DIR, false);
-   SETTING_BOOL("quit_press_twice",              &settings->bools.quit_press_twice, true, DEFAULT_QUIT_PRESS_TWICE, false);
+   SETTING_BOOL("confirm_quit",                  &settings->bools.confirm_quit, true, DEFAULT_CONFIRM_QUIT, false);
+   SETTING_BOOL("confirm_close",                 &settings->bools.confirm_close, true, DEFAULT_CONFIRM_CLOSE, false);
+   SETTING_BOOL("confirm_reset",                 &settings->bools.confirm_reset, true, DEFAULT_CONFIRM_RESET, false);
    SETTING_BOOL("config_save_on_exit",           &settings->bools.config_save_on_exit, true, DEFAULT_CONFIG_SAVE_ON_EXIT, false);
    SETTING_BOOL("remap_save_on_exit",            &settings->bools.remap_save_on_exit, true, DEFAULT_REMAP_SAVE_ON_EXIT, false);
    SETTING_BOOL("show_hidden_files",             &settings->bools.show_hidden_files, true, DEFAULT_SHOW_HIDDEN_FILES, false);
@@ -3292,7 +3292,6 @@ void config_set_defaults(void *data)
             sizeof(settings->paths.directory_osk_overlay));
 #endif
 
-#ifdef HAVE_MENU
    if (!string_is_empty(g_defaults.dirs[DEFAULT_DIR_MENU_CONFIG]))
    {
       configuration_set_string(settings,
@@ -3315,7 +3314,7 @@ void config_set_defaults(void *data)
       configuration_set_string(settings,
             settings->paths.directory_menu_content,
             g_defaults.dirs[DEFAULT_DIR_MENU_CONTENT]);
-#endif
+
    if (!string_is_empty(g_defaults.dirs[DEFAULT_DIR_AUTOCONFIG]))
       configuration_set_string(settings,
             settings->paths.directory_autoconfig,
@@ -4554,6 +4553,20 @@ static bool config_load_file(global_t *global,
          settings->ints.content_favorites_size = (int)settings->uints.content_history_size;
    }
 
+   /* Migrate "quit_press_twice" to "confirm_quit" */
+   {
+      const char *tmp_key = "quit_press_twice";
+      struct config_entry_list *tmp = config_get_entry(conf, tmp_key);
+      if (tmp)
+      {
+         configuration_set_bool(settings,
+               settings->bools.confirm_quit,
+               string_is_equal(tmp->value, "true") ? true : false);
+         RARCH_LOG("[Config] Migrated \"%s\" to \"confirm_quit\" = \"%s\".\n",
+               tmp->key, tmp->value);
+      }
+   }
+
    if (conf)
       config_file_free(conf);
    if (bool_settings)
@@ -4600,7 +4613,6 @@ bool config_load_override(void *data)
    char content_path[PATH_MAX_LENGTH];
    char config_directory[DIR_MAX_LENGTH];
    bool should_append                     = false;
-   bool show_notification                 = true;
    rarch_system_info_t *sys_info          = (rarch_system_info_t*)data;
    const char *core_name                  = sys_info
       ? sys_info->info.library_name : NULL;
@@ -4655,16 +4667,12 @@ bool config_load_override(void *data)
 
    /* Prevent "--appendconfig" from being ignored */
    if (!path_is_empty(RARCH_PATH_CONFIG_APPEND))
-   {
-      should_append     = true;
-      show_notification = false;
-   }
+      should_append = true;
 
    /* per-core overrides */
    /* Create a new config file from core_path */
    if (path_is_valid(core_path))
    {
-
       RARCH_LOG("[Override] Core-specific overrides found at \"%s\".\n",
             core_path);
 
@@ -4683,8 +4691,7 @@ bool config_load_override(void *data)
       else
          path_set(RARCH_PATH_CONFIG_OVERRIDE, core_path);
 
-      should_append     = true;
-      show_notification = true;
+      should_append = true;
    }
 
    if (has_content)
@@ -4711,8 +4718,7 @@ bool config_load_override(void *data)
          else
             path_set(RARCH_PATH_CONFIG_OVERRIDE, content_path);
 
-         should_append     = true;
-         show_notification = true;
+         should_append = true;
       }
 
       /* per-game overrides */
@@ -4737,8 +4743,7 @@ bool config_load_override(void *data)
          else
             path_set(RARCH_PATH_CONFIG_OVERRIDE, game_path);
 
-         should_append     = true;
-         show_notification = true;
+         should_append = true;
       }
    }
 
@@ -4752,12 +4757,11 @@ bool config_load_override(void *data)
    retroarch_override_setting_unset(RARCH_OVERRIDE_SETTING_STATE_PATH, NULL);
    retroarch_override_setting_unset(RARCH_OVERRIDE_SETTING_SAVE_PATH, NULL);
 
-   if (!config_load_file(global_get_ptr(),
-            path_get(RARCH_PATH_CONFIG), settings))
+   if (!config_load_file(global_get_ptr(), path_get(RARCH_PATH_CONFIG), settings))
       return false;
 
-   if (settings->bools.notification_show_config_override_load
-         && show_notification)
+   if (     settings->bools.notification_show_config_override_load
+         && !string_is_empty(path_get(RARCH_PATH_CONFIG_OVERRIDE)))
    {
       char msg[128];
       size_t _len = strlcpy(msg, msg_hash_to_str(MSG_CONFIG_OVERRIDE_LOADED), sizeof(msg));
@@ -4795,8 +4799,7 @@ bool config_load_override_file(const char *config_path)
    retroarch_override_setting_unset(RARCH_OVERRIDE_SETTING_STATE_PATH, NULL);
    retroarch_override_setting_unset(RARCH_OVERRIDE_SETTING_SAVE_PATH, NULL);
 
-   if (!config_load_file(global_get_ptr(),
-            path_get(RARCH_PATH_CONFIG), settings))
+   if (!config_load_file(global_get_ptr(), path_get(RARCH_PATH_CONFIG), settings))
       return false;
 
    if (settings->bools.notification_show_config_override_load)
@@ -5693,6 +5696,14 @@ bool config_save_file(const char *path)
 
    for (i = 0; i < MAX_USERS; i++)
       input_config_save_keybinds_user(conf, i);
+
+   /* Remove unused "quit_press_twice" after migrating to "confirm_quit" */
+   {
+      const char *tmp_key = "quit_press_twice";
+      struct config_entry_list *tmp = config_get_entry(conf, tmp_key);
+      if (tmp)
+         config_unset(conf, tmp->key);
+   }
 
    ret = config_file_write(conf, path, true);
    config_file_free(conf);

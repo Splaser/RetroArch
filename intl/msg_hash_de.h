@@ -2627,8 +2627,36 @@ MSG_HASH(
    "Maximale Leuchtdichte"
    )
 MSG_HASH(
+   MENU_ENUM_SUBLABEL_VIDEO_HDR_MAX_NITS,
+   "Die maximale Leuchtdichte (in cd/m²) festlegen, die der Bildschirm darstellen kann. Dieser Wert sollte nach der Einstellung nicht mehr geändert werden. Die Papierweiß-Leuchtdichte dient zur Anpassung der Helligkeit. Die maximale Leuchtdichte des Bildschirms ist auf RTings.com zu finden. Bei einigen Bildschirmen mit Scanlines (siehe unten) kann es erforderlich sein, die Leuchtdichte (und die Papierweiß-Leuchtdichte) zu erhöhen, um die Gesamthelligkeit zu steigern."
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_VIDEO_HDR_PAPER_WHITE_NITS,
    "Papierweißleuchtdichte"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_VIDEO_HDR_PAPER_WHITE_NITS,
+   "Sobald die maximale Leuchtdichte eingestellt ist, diese als Standardhelligkeitseinstellung verwenden. Technisch gesehen legt dies die Leuchtdichte fest, bei der Papierweiß gut lesbar sein sollte - also die Leuchtdichte am oberen Ende des SDR-Bereichs (Standard Dynamic Range)."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_VIDEO_HDR_EXPAND_GAMUT,
+   "Farbverstärkung"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_VIDEO_HDR_EXPAND_GAMUT,
+   "Nutzt den vollen Farbraum des Bildschirms, um ein helleres und farbintensiveres Bild zu erzeugen. Für eine farbgetreuere Darstellung des Originalspiels diese Option auf AUS stellen."
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_VIDEO_HDR_SCANLINES,
+   "HDR-Scanlines aktivieren. Scanlines sind der Hauptgrund für die Verwendung von HDR in RetroArch, da eine präzise Scanline-Implementierung den größten Teil des Bildschirms abdunkelt und HDR einen Teil der verlorenen Helligkeit wiederherstellt. Für eine detailliertere Steuerung der Scanlines können die von RetroArch bereitgestellten benutzerdefinierten Shader verwendet werden."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_VIDEO_HDR_SUBPIXEL_LAYOUT,
+   "Subpixel-Layout"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_VIDEO_HDR_SUBPIXEL_LAYOUT,
+   "Subpixel-Layout des Bildschirms auswählen. Dies wirkt sich nur auf Scanlines aus. Falls das „Subpixel-Layout“ des Bildschirms nicht bekannt ist, können entsprechende Informationen auf Rtings.com gefunden werden"
    )
 
 
@@ -3526,13 +3554,30 @@ MSG_HASH(
    "Problembehebung für Controller, die die Verbindung trennen und wiederherstellen. Betrifft 2 Spieler mit den gleichen Controllern."
    )
 MSG_HASH(
-   MENU_ENUM_LABEL_VALUE_QUIT_PRESS_TWICE,
-   "Beenden/Schließen/Zurücksetzen bestätigen"
+   MENU_ENUM_LABEL_VALUE_CONFIRM_QUIT,
+   "Beenden bestätigen"
    )
 MSG_HASH(
-   MENU_ENUM_SUBLABEL_QUIT_PRESS_TWICE,
-   "Verlangt, dass der Hotkey Beenden/Schließen/Zurücksetzen zweimal gedrückt wird."
+   MENU_ENUM_SUBLABEL_CONFIRM_QUIT,
+   "Die Taste zum Beenden muss zweimal gedrückt werden."
    )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_CONFIRM_CLOSE,
+   "Inhalt schließen bestätigen"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_CONFIRM_CLOSE,
+   "Die Taste zum Schießen des Inhalts muss zweimal gedrückt werden."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_CONFIRM_RESET,
+   "Inhalt zurücksetzen bestätigen"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_CONFIRM_RESET,
+   "Die Taste zum Zurücksetzen des Inhalts muss zweimal gedrückt werden."
+   )
+
 
 /* Settings > Input > Haptic Feedback/Vibration */
 
@@ -15972,8 +16017,16 @@ MSG_HASH(
    "SMB-Netzwerkeinstellungen"
    )
 MSG_HASH(
+   MENU_ENUM_SUBLABEL_SMB_CLIENT_SETTINGS,
+   "SMB-Netzwerkfreigabe-Einstellungen konfigurieren."
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SMB_CLIENT_ENABLE,
    "SMB-Client aktivieren"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SMB_CLIENT_ENABLE,
+   "Aktiviert den Zugriff auf die SMB-Netzwerkfreigabe. Für eine zuverlässigere Verbindung wird Ethernet gegenüber WLAN dringend empfohlen."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SMB_CLIENT_SERVER,
@@ -15988,8 +16041,16 @@ MSG_HASH(
    "SMB-Freigabename"
    )
 MSG_HASH(
+   MENU_ENUM_SUBLABEL_SMB_CLIENT_SHARE,
+   "Name der Netzwerkfreigabe, auf die zugegriffen werden soll."
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SMB_CLIENT_SUBDIR,
    "SMB-Unterverzeichnis (optional)"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SMB_CLIENT_SUBDIR,
+   "Unterverzeichnispfad auf der Freigabe."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SMB_CLIENT_USERNAME,
@@ -16020,6 +16081,10 @@ MSG_HASH(
    "SMB-Authentifizierungsmodus"
    )
 MSG_HASH(
+   MENU_ENUM_SUBLABEL_SMB_CLIENT_AUTH_MODE,
+   "Auswahl der in der Umgebung verwendeten Authentifizierung."
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SMB_CLIENT_NUM_CONTEXTS,
    "Maximale SMB-Verbindungen"
    )
@@ -16038,6 +16103,18 @@ MSG_HASH(
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SMB_CLIENT_BROWSE,
    "SMB-Freigabe durchsuchen"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SMB_CLIENT_BROWSE,
+   "Dateien auf der konfigurierten SMB-Freigabe durchsuchen."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SETTINGS_SHOW_SMB_CLIENT,
+   "„SMB-Client“ anzeigen"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SETTINGS_SHOW_SMB_CLIENT,
+   "„SMB-Client“-Einstellungen anzeigen."
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SMB_CLIENT_SMB_SHARE,

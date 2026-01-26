@@ -3653,14 +3653,7 @@ MSG_HASH(
    MENU_ENUM_SUBLABEL_ANDROID_INPUT_DISCONNECT_WORKAROUND,
    "Réiteach sealadach ar rialtóirí ag dícheangal agus ag athcheangal. Cuireann sé bac ar 2 imreoir leis na rialtóirí céanna."
    )
-MSG_HASH(
-   MENU_ENUM_LABEL_VALUE_QUIT_PRESS_TWICE,
-   "Deimhnigh Scoir/Dún/Athshocraigh"
-   )
-MSG_HASH(
-   MENU_ENUM_SUBLABEL_QUIT_PRESS_TWICE,
-   "Éilítear go mbrúitear an eochair the Scoir/Dún/Athshocraigh faoi dhó."
-   )
+
 
 /* Settings > Input > Haptic Feedback/Vibration */
 
@@ -8770,6 +8763,54 @@ MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SCAN_ENTRY,
    "Scanadh"
    )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_METHOD,
+   "Modh Scanadh"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SCAN_METHOD,
+   "Uathoibríoch nó saincheaptha le roghanna mionsonraithe."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_USE_DB,
+   "Seiceáil Bunachar Sonraí"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SCAN_USE_DB,
+   "Ní chuirfidh Strict ach míreanna leis a mheaitseálann iontráil bunachar sonraí, cuirfidh Loose comhaid leis an síneadh ceart ach gan aon mheaitseáil CRC/sraitheach leis, déanfaidh Custom DAT seiceálacha i gcoinne comhaid XML arna soláthar ag an úsáideoir in ionad bunachair shonraí, ní dhéanann None neamhaird ar bhunachair shonraí agus ní úsáideann sé ach síntí comhad."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_DB_SELECT,
+   "Bunachar Sonraí le Meaitseáil"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SCAN_DB_SELECT,
+   "Is féidir meaitseáil a shrianadh do bhunachar sonraí amháin, nó don chéad bhunachar sonraí a mheaitseálann, chun scanadh a bhrostú."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_TARGET_PLAYLIST,
+   "Seinmliosta le Nuashonrú"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SCAN_TARGET_PLAYLIST,
+   "Cuirtear torthaí leis an seinmliosta seo. I gcás Uathoibríoch - Aon cheann, féadfar seinmliostaí córais iolracha a nuashonrú. Ní nascfaidh Saincheaptha gan tagairt do bhunachar sonraí na hiontrálacha le haon bhunachar sonraí sa seinmliosta."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_SINGLE_FILE,
+   "Scanadh Comhad Aonair"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SCAN_SINGLE_FILE,
+   "Ní dhéanann sé ach comhad amháin a scanadh in ionad eolaire. Athroghnaigh suíomh an ábhair tar éis an iontráil seo a athrú."
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_OMIT_DB_REF,
+   "Léim thar Thagairtí Bunachar Sonraí ón Seinmliosta"
+   )
+MSG_HASH(
+   MENU_ENUM_SUBLABEL_SCAN_OMIT_DB_REF,
+   "I gcás ainm seinmliosta saincheaptha, bain úsáid as ainm an seinmliosta i gcónaí le haghaidh cuardaigh mionsamhlacha, fiú má bhí meaitseáil bhunachar sonraí ann."
+   )
 
 /* Import Content > Scan File */
 
@@ -10973,6 +11014,10 @@ MSG_HASH(
    "<Eolaire Ábhair>"
    )
 MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_MANUAL_CONTENT_SCAN_SYSTEM_NAME_USE_AUTO,
+   "<Uathoibríoch>"
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_MANUAL_CONTENT_SCAN_SYSTEM_NAME_USE_CUSTOM,
    "<Saincheaptha>"
    )
@@ -10981,12 +11026,44 @@ MSG_HASH(
    "<Gan Sonrú>"
    )
 MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_METHOD_AUTO,
+   "Lán-Uathoibríoch"
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SCAN_METHOD_CUSTOM,
    "Saincheaptha"
    )
 MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_USE_DB_STRICT,
+   "Dian"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_USE_DB_LOOSE,
+   "Scaoilte"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_USE_DB_CUSTOM_DAT,
+   "DAT Saincheaptha (Docht)"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_USE_DB_CUSTOM_DAT_LOOSE,
+   "DAT Saincheaptha (Scaoilte)"
+   )
+MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SCAN_USE_DB_NONE,
    "Dada"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_DB_SELECT_AUTO_ANY,
+   "<Uathoibríoch/Aon>"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_DB_SELECT_AUTO_FIRST,
+   "<Uathoibríoch/An chéad mheaitseáil>"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_SCAN_TARGET_PLAYLIST_AUTO_ANY,
+   "<Ainm uathoibríoch/córais>"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SCAN_TARGET_PLAYLIST_CUSTOM,
@@ -11007,6 +11084,22 @@ MSG_HASH(
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_RIGHT_ANALOG_FORCED,
    "Analógach dheis (Éignithe)"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_LEFTRIGHT_ANALOG,
+   "Analógacha Clé + Deas"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_LEFTRIGHT_ANALOG_FORCED,
+   "Analógacha Clé + Deas (Éignithe)"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_TWINSTICK_ANALOG,
+   "Analógacha Dúbailte-Bata"
+   )
+MSG_HASH(
+   MENU_ENUM_LABEL_VALUE_TWINSTICK_ANALOG_FORCED,
+   "Analógacha Dúbailte-Bata (Éignithe)"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_INPUT_KEY,
